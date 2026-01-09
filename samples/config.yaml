@@ -1,7 +1,7 @@
 page_title: "Weekly Schedule"
 font:
   name: "NotoSansCJK"
-  path: "fonts/NotoSansCJKjp-Regular.otf"
+  path: "fonts/NotoSansCJKjp-VF.ttf"
 
 time_table:
   1: ["09:00", "10:30"]

@@ -23,28 +23,28 @@ fonts/NotoSansCJKjp-Regular.otf
 ## 実行例
 
 ```bash
-python timetable_pdf.py \
-  --week-start 2026-01-05 \
-  --config config.yaml \
-  --classes classes.yaml \
-  --special special_days.yaml \
-  --work work_shifts.txt \
-  --events events_2026.txt \
-  --daily on \
+python timetable_pdf.py `
+  --week-start 2026-01-05 `
+  --config config.yaml `
+  --classes classes.yaml `
+  --special special_days.yaml `
+  --work work_shifts.txt `
+  --events events_2026.txt `
+  --daily on `
   --out out/2026-W02.pdf
 ```
 
 サンプル入力は `samples/` に用意しています。
 
 ```bash
-python timetable_pdf.py \
-  --week-start 2026-01-05 \
-  --config samples/config.yaml \
-  --classes samples/classes.yaml \
-  --special samples/special_days.yaml \
-  --work samples/work_shifts.txt \
-  --events samples/events_2026.txt \
-  --daily on \
+python timetable_pdf.py `
+  --week-start 2026-01-05 `
+  --config samples/config.yaml `
+  --classes samples/classes.yaml `
+  --special samples/special_days.yaml `
+  --work samples/work_shifts.txt `
+  --events samples/events_2026.txt `
+  --daily on `
   --out out/2026-W02.pdf
 ```
 
