@@ -64,15 +64,23 @@ def build_week_events(
 def _group_by_date(items: List[dict]) -> Dict[date, List[dict]]:
     grouped: Dict[date, List[dict]] = {}
     for item in items:
-        grouped.setdefault(item["date"], []).append(item)
+        grouped.setdefault(_parse_date(item.get("date")), []).append(item)
     return grouped
 
 
 def _group_special(items: Iterable[dict]) -> Dict[date, List[dict]]:
     grouped: Dict[date, List[dict]] = {}
     for item in items:
-        grouped.setdefault(date.fromisoformat(item["date"]), []).append(item)
+        grouped.setdefault(_parse_date(item.get("date")), []).append(item)
     return grouped
+
+
+def _parse_date(value: object) -> date:
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str):
+        return date.fromisoformat(value)
+    raise TypeError(f"Unsupported date value: {value!r}")
 
 
 def _build_routines_for_week(
