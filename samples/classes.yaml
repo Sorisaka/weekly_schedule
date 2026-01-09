@@ -1,0 +1,9 @@
+mon:
+  1:
+    title: "経済学"
+    location: "A101"
+  2:
+    title: "統計学"
+wed:
+  3:
+    title: "ゼミ"
