@@ -1,0 +1,45 @@
+page_title: "Weekly Schedule"
+font:
+  name: "NotoSansCJK"
+  path: "fonts/NotoSansCJKjp-VF.ttf"
+
+time_table:
+  1: ["08:50", "10:30"]
+  2: ["10:40", "12:20"]
+  3: ["13:10", "14:50"]
+
+routines:
+  free_override_mode: false
+  work_type_thresholds:
+    night_end: "05:00"
+    morning_start: "09:00"
+  pattern_nonwork:
+    睡眠: ["00:00", "08:00"]
+    朝散歩: ["08:10", "08:25"]
+    朝食: ["08:35", "08:50"]
+    昼食: ["12:20", "13:10"]
+    夕食準備: ["19:10", "19:30"]
+    夕食: ["19:30", "20:00"]
+    ノースクリーン: ["23:00", "00:00"]
+  pattern_work_night:
+    睡眠: ["00:00", "08:00"]
+    朝散歩: ["08:10", "08:25"]
+    朝食: ["08:35", "08:50"]
+    昼食: ["12:20", "13:10"]
+    夕食準備: ["16:50", "17:10"]
+    夕食: ["17:10", "17:30"]
+    軽食: ["23:20", "23:30"]
+    ノースクリーン: ["23:30", "00:00"]
+  pattern_work_morning:
+    睡眠: ["04:30", "11:00"]
+    昼食: ["12:30", "13:00"]
+    夕食: ["19:30", "20:00"]
+
+colors:
+  sleep: "#DDEEFF"
+  meal: "#FFF2CC"
+  walk: "#E6FFDA"
+  class: "#D8E8FF"
+  work: "#FFE0CC"
+  move: "#E8E8E8"
+  free: "#E8D8FF"

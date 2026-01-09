@@ -1,0 +1,9 @@
+canceled:
+  - date: 2026-01-08
+    period: 2
+    note: "休講"
+  - date: 2026-01-09
+ondemand:
+  - date: 2026-01-10
+    period: 1
+    note: "オンデマンド"
