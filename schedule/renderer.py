@@ -26,6 +26,10 @@ class ScheduleRenderer:
         self.margin_bottom = 15 * mm
         self.time_column_width = 20 * mm
         self.header_height = 12 * mm
+        self.max_event_font_size = config.max_event_font_size
+        self.min_event_font_size = 6
+        self.event_text_padding_x = 4
+        self.event_text_padding_y = 3
 
     def register_font(self) -> None:
         if not self.config.font_path:
@@ -74,6 +78,7 @@ class ScheduleRenderer:
                     grid_bottom,
                     day_width,
                     grid_top,
+                    center_text=True,
                 )
         c.showPage()
 
@@ -90,7 +95,15 @@ class ScheduleRenderer:
         day_events = daily_events.get(day, [])
         mark_conflicts(day_events)
         for event in day_events:
-            self._draw_event_block(c, event, grid_left, grid_bottom, grid_right - grid_left, grid_top)
+            self._draw_event_block(
+                c,
+                event,
+                grid_left,
+                grid_bottom,
+                grid_right - grid_left,
+                grid_top,
+                center_text=False,
+            )
         c.showPage()
 
     def _draw_day_headers(self, c: canvas.Canvas, grid_left: float, grid_top: float, day_width: float, start: date) -> None:
@@ -111,7 +124,7 @@ class ScheduleRenderer:
         total_minutes = end_minutes - start_minutes
         height = top - bottom
         for minute in range(start_minutes, end_minutes + 1, 10):
-            y = bottom + (minute - start_minutes) / total_minutes * height
+            y = top - (minute - start_minutes) / total_minutes * height
             if minute % 60 == 0:
                 c.setStrokeColor(colors.grey)
                 c.setLineWidth(0.6)
@@ -139,6 +152,7 @@ class ScheduleRenderer:
         bottom: float,
         width: float,
         top: float,
+        center_text: bool,
     ) -> None:
         start_minutes = 0
         end_minutes = 24 * 60
@@ -152,26 +166,59 @@ class ScheduleRenderer:
             return
         event_start = max(event_start, start_minutes)
         event_end = min(event_end, end_minutes)
-        y_start = bottom + (event_start - start_minutes) / total_minutes * schedule_height
-        y_end = bottom + (event_end - start_minutes) / total_minutes * schedule_height
-        height = max(y_end - y_start, 4)
+        y_start = top - (event_start - start_minutes) / total_minutes * schedule_height
+        y_end = top - (event_end - start_minutes) / total_minutes * schedule_height
+        y_top = max(y_start, y_end)
+        y_bottom = min(y_start, y_end)
+        height = max(y_top - y_bottom, 4)
         fill = _hex_to_color(event.color)
         c.setFillColor(fill)
         c.setStrokeColor(colors.red if event.conflict else colors.black)
         c.setLineWidth(1.0 if event.conflict else 0.4)
-        c.rect(x + 1, y_start, width - 2, height, fill=1, stroke=1)
+        c.rect(x + 1, y_bottom, width - 2, height, fill=1, stroke=1)
         c.setFillColor(colors.black)
-        font_size = 8 if height >= 10 else 6
-        c.setFont(self.config.font_name, font_size)
-        text_y = y_start + height - (font_size + 2)
         label = event.title
         if event.note:
             label = f"{label} ({event.note})"
-        for line in _wrap_text(label, width - 4, c, self.config.font_name, font_size):
-            if text_y < y_start + 2:
-                break
-            c.drawString(x + 3, text_y, line)
-            text_y -= font_size + 1
+        label = label.replace("\\n", "\n")
+        content_width = width - self.event_text_padding_x * 2
+        content_height = height - self.event_text_padding_y * 2
+        if content_width <= 0 or content_height <= 0:
+            return
+        font_size, lines = _fit_text_to_box(
+            label,
+            content_width,
+            content_height,
+            c,
+            self.config.font_name,
+            self.max_event_font_size,
+            self.min_event_font_size,
+        )
+        if not lines:
+            return
+        c.setFont(self.config.font_name, font_size)
+        line_gap = 1
+        line_height = font_size + line_gap
+        text_block_height = len(lines) * line_height - line_gap
+        if center_text:
+            if text_block_height > height - self.event_text_padding_y * 2:
+                text_y = y_top - (font_size + self.event_text_padding_y)
+            else:
+                text_y = y_bottom + (height + text_block_height) / 2 - font_size
+            for line in lines:
+                if text_y < y_bottom + self.event_text_padding_y:
+                    break
+                line_width = c.stringWidth(line, self.config.font_name, font_size)
+                text_x = x + self.event_text_padding_x + (content_width - line_width) / 2
+                c.drawString(text_x, text_y, line)
+                text_y -= line_height
+        else:
+            text_y = y_top - (font_size + self.event_text_padding_y)
+            for line in lines:
+                if text_y < y_bottom + self.event_text_padding_y:
+                    break
+                c.drawString(x + self.event_text_padding_x, text_y, line)
+                text_y -= line_height
 
     @staticmethod
     def _group_events(events: List[Event]) -> Dict[date, List[Event]]:
@@ -202,18 +249,38 @@ class ScheduleRenderer:
 
 
 def _wrap_text(text: str, max_width: float, canvas_obj: canvas.Canvas, font_name: str, font_size: int) -> List[str]:
-    words = list(text)
     lines: List[str] = []
-    current = ""
-    for char in words:
-        if canvas_obj.stringWidth(current + char, font_name, font_size) > max_width and current:
-            lines.append(current)
-            current = char
-        else:
-            current += char
-    if current:
+    for raw_line in text.splitlines() or [""]:
+        current = ""
+        for char in list(raw_line):
+            if canvas_obj.stringWidth(current + char, font_name, font_size) > max_width and current:
+                lines.append(current)
+                current = char
+            else:
+                current += char
         lines.append(current)
     return lines
+
+
+def _fit_text_to_box(
+    text: str,
+    max_width: float,
+    max_height: float,
+    canvas_obj: canvas.Canvas,
+    font_name: str,
+    max_font_size: int,
+    min_font_size: int,
+) -> tuple[int, List[str]]:
+    line_gap = 1
+    for font_size in range(max_font_size, min_font_size - 1, -1):
+        lines = _wrap_text(text, max_width, canvas_obj, font_name, font_size)
+        if not lines:
+            return font_size, lines
+        line_height = font_size + line_gap
+        total_height = len(lines) * line_height - line_gap
+        if total_height <= max_height:
+            return font_size, lines
+    return min_font_size, _wrap_text(text, max_width, canvas_obj, font_name, min_font_size)
 
 
 def _hex_to_color(value: str) -> colors.Color:
