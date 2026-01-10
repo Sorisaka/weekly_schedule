@@ -66,6 +66,7 @@ time_table:
 # 習慣パターン
 routines:
   free_override_mode: false
+  hide_routine_conflicts: true
   work_type_thresholds:
     night_end: "05:00"
     morning_start: "09:00"

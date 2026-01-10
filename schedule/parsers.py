@@ -18,6 +18,7 @@ class Config:
     time_table: Dict[int, tuple[int, int]]
     routines: Dict[str, Dict[str, tuple[int, int]]]
     free_override_mode: bool
+    hide_routine_conflicts: bool
     work_type_thresholds: Dict[str, int]
     colors: Dict[str, str]
     font_path: Optional[str]
@@ -70,6 +71,7 @@ def load_config(path: Path) -> Config:
         }
 
     free_override_mode = bool(routines_cfg.get("free_override_mode", False))
+    hide_routine_conflicts = bool(routines_cfg.get("hide_routine_conflicts", True))
     thresholds_cfg = routines_cfg.get("work_type_thresholds", {}) or {}
     work_type_thresholds = {
         "night_end": parse_time_token(str(thresholds_cfg.get("night_end", "05:00"))),
@@ -88,6 +90,7 @@ def load_config(path: Path) -> Config:
         time_table=time_table,
         routines=routine_patterns,
         free_override_mode=free_override_mode,
+        hide_routine_conflicts=hide_routine_conflicts,
         work_type_thresholds=work_type_thresholds,
         colors=colors,
         font_path=font_path,
