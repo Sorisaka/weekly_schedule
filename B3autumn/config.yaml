@@ -10,6 +10,7 @@ time_table:
 
 routines:
   free_override_mode: false
+  hide_routine_conflicts: true # 衝突時習慣予定非表示=true
   work_type_thresholds:
     night_end: "05:00"
     morning_start: "09:00"

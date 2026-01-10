@@ -48,6 +48,8 @@ def build_week_events(
         normalized.extend(_split_multi_day_event(event))
 
     routines = _build_routines_for_week(week_start, config, normalized, colors)
+    if config.hide_routine_conflicts:
+        routines = _filter_routines_conflicting_with_events(routines, normalized)
     combined = normalized + routines
     with_specials = _apply_special_days(
         week_start,
@@ -316,6 +318,26 @@ def _routine_category(name: str) -> str:
     if "walk" in lowered or "散歩" in name:
         return "walk"
     return "free"
+
+
+def _filter_routines_conflicting_with_events(routines: List[Event], events: List[Event]) -> List[Event]:
+    event_candidates = [event for event in events if event.source == "event"]
+    if not event_candidates:
+        return routines
+    events_by_day: Dict[date, List[Event]] = {}
+    for event in event_candidates:
+        events_by_day.setdefault(event.day, []).append(event)
+    filtered: List[Event] = []
+    for routine in routines:
+        day_events = events_by_day.get(routine.day, [])
+        if any(_events_overlap(routine, event) for event in day_events):
+            continue
+        filtered.append(routine)
+    return filtered
+
+
+def _events_overlap(left: Event, right: Event) -> bool:
+    return left.start_min < right.end_min and left.end_min > right.start_min
 
 
 def _group_work_events(events: List[Event]) -> Dict[date, List[Event]]:
