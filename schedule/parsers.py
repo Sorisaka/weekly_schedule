@@ -25,6 +25,7 @@ class Config:
     page_title: str
     day_start_min: int
     day_end_min: int
+    max_event_font_size: int
 
 
 def parse_time_token(value: str) -> int:
@@ -81,6 +82,7 @@ def load_config(path: Path) -> Config:
     page_title = data.get("page_title", "Weekly Schedule")
     day_start_min = parse_time_token(str(data.get("day_start", "06:00")))
     day_end_min = parse_time_token(str(data.get("day_end", "24:00")))
+    max_event_font_size = int(data.get("max_event_font_size", 20))
 
     return Config(
         time_table=time_table,
@@ -93,6 +95,7 @@ def load_config(path: Path) -> Config:
         page_title=page_title,
         day_start_min=day_start_min,
         day_end_min=day_end_min,
+        max_event_font_size=max_event_font_size,
     )
 
 

@@ -1,0 +1,19 @@
+mon:
+  2:
+    title: "データベース"
+    location: "57-202"
+tue:
+  2:
+    title: "プログラミング言語"
+    location: "56-101"
+wed:
+  2:
+    title: "人工知能と複雑系"
+    location: "57-202"
+  3:
+    title: "コンピュータアーキテクチャB"
+    location: "52-104"
+thr:
+  2:
+    title: "パターン認識"
+    location: "54-204"
