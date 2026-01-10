@@ -27,7 +27,7 @@ class ScheduleRenderer:
         self.time_column_width = 20 * mm
         self.header_height = 12 * mm
         self.max_event_font_size = config.max_event_font_size
-        self.min_event_font_size = 6
+        # self.min_event_font_size = 6
         self.event_text_padding_x = 4
         self.event_text_padding_y = 3
         # 10〜15分程度の短い予定ブロックは、縦幅が数ptしか取れず
@@ -205,9 +205,10 @@ class ScheduleRenderer:
             pad_x = 2
             content_width = max(1, width - pad_x * 2)
             # 文字のベースラインが上下に食い込みやすいので 1pt だけ安全域を取る
-            font_size = max(3, min(self.min_event_font_size, int(height - 1)))
+            # font_size = max(3, min(self.min_event_font_size, int(height - 1)))
+            font_size = max(3, int(height - 1))
             # 10分(約7pt)でも6ptは現実的に読めるため、上限を6にする
-            font_size = min(font_size, 6)
+            font_size = min(font_size, 8)
             c.setFont(self.config.font_name, font_size)     
 
             first_line = (label.splitlines() or [""])[0]
